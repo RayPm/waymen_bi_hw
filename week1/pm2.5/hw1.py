@@ -9,7 +9,7 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, LSTM
 
 # 作业
-# 通过LSTM预测北京PM2.5
+# 通过LSTM预预测未来北京PM2.5的值
 class TsaPred(object):
     def __init__(self):
         self.dataset = None
