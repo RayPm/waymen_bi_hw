@@ -8,7 +8,7 @@ from sklearn.preprocessing import LabelEncoder, MinMaxScaler
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, LSTM
 
-
+# 作业
 # 通过LSTM预测北京PM2.5
 class TsaPred(object):
     def __init__(self):
