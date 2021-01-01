@@ -8,8 +8,9 @@ from sklearn.preprocessing import LabelEncoder, MinMaxScaler
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, LSTM
 
+
 # 作业
-# 通过LSTM预测北京PM2.5
+# 通过LSTM预预测未来北京PM2.5的值
 class TsaPred(object):
     def __init__(self):
         self.dataset = None
@@ -82,6 +83,7 @@ if __name__ == '__main__':
     reframed = tsa.transform(scaled, 1, 1)
     # 去掉不需要预测的列, 只保留需要预测的列
     reframed.drop(reframed.columns[[9, 10, 11, 12, 13, 14, 15]], axis=1, inplace=True)
+    # 训练集切割，分为训练数据集和测试数据集
     # 由于时间序列不连续，所以不能使用shuffle=True的train_test_split方法
     n_train_hours = int(len(reframed.values) * 0.8)
     train = reframed.values[:n_train_hours, :]
@@ -95,7 +97,7 @@ if __name__ == '__main__':
     # 测试集-真实值
     test_y = test[:, -1]
 
-    # 转换为3D格式：[样本数， 时间步，特征]
+    # LSTM要求，输入数据要转换为3D格式：[样本数， 时间步，特征]
     train_X = train_X.reshape(train_X.shape[0], 1, train_X.shape[1])
     test_X = test_X.reshape(test_X.shape[0], 1, test_X.shape[1])
 
@@ -126,6 +128,7 @@ if __name__ == '__main__':
 
     model.summary()
 
+    print(reframed.values[:, -1])
     # 直观显示结果
     plt.plot(reframed.values[:, -1], label='real', c='b')
     plt.plot([x for x in train_predict], label='trainpredict', c='g')
