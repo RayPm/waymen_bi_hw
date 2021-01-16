@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
 '''
-交通流量预测
+Action1：交通流量预测
+
 JetRail高铁的乘客数量预测
 数据集：jetrail.csv，根据过往两年的数据（2012 年 8 月至 2014 年 8月），需要用这些数据预测接下来 7 个月的乘客数量
 以每天为单位聚合数据集
@@ -32,8 +33,10 @@ model = Prophet(yearly_seasonality=True, seasonality_prior_scale=0.1)
 model.fit(df_day)
 future = model.make_future_dataframe(periods=213)
 forecast = model.predict(future)
-print(forecast[['ds', 'yhat']])
+# print(forecast)
 # pycharm 不能正常显示，jupyter可以
-# model.plot(forecast)
-plt.plot(forecast[['trend', 'yhat_lower', 'yhat_upper', 'yhat']])
+# model.plot
+
+plt.scatter(df_day['ds'].values, df_day['y'].values)
+plt.plot(forecast['ds'],forecast[['trend', 'yhat_lower', 'yhat_upper', 'yhat']])
 plt.show()
