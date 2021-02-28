@@ -3,12 +3,17 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 import xgboost as xgb
 
+TRAIN_DATA = '../data_format1/train_format1.csv'
+TEST_DATA = '../data_format1/test_format1.csv'
+USER_INFO_DATA = '../data_format1/user_info_format1.csv'
+USER_LOG_DATA = '../data_format1/user_log_format1.csv'
+
 
 def get_data():
     # 训练集,方便做特征工程(user_id 和 label)
-    train_data1 = pd.read_csv('../data_format1/train_format1.csv')
+    train_data1 = pd.read_csv(TRAIN_DATA)
     # 测试集
-    submission = pd.read_csv('../data_format1/test_format1.csv')
+    submission = pd.read_csv(TEST_DATA)
 
     train_data1['origin'] = 'train'
     submission['origin'] = 'test'
@@ -25,7 +30,7 @@ def get_data():
 
 def matrix_user_info(data):
     # 用户画像
-    user_info = pd.read_csv('../data_format1/user_info_format1.csv')
+    user_info = pd.read_csv(USER_INFO_DATA)
 
     # 连接user_info表，通过user_id关联
     data = data.merge(user_info, on='user_id', how='left')
@@ -46,11 +51,11 @@ def matrix_user_info(data):
 
 
 # 关联user_log数据，增加特征值
-def matrix_user_log(data):
+def matrix_user_log(data, din=False):
     # 负采样数据集
     train_data = pd.read_csv('../data_format2/train_format2.csv')
     # 用户行为日志
-    user_log = pd.read_csv('../data_format1/user_log_format1.csv', dtype={'time_stamp': 'str'})
+    user_log = pd.read_csv(USER_LOG_DATA, dtype={'time_stamp': 'str'})
     # 使用merchant_id（原列名seller_id）
     user_log.rename(columns={'seller_id': 'merchant_id'}, inplace=True)
     # 格式化
@@ -125,6 +130,16 @@ def matrix_user_log(data):
     temp['um9'] = (temp['last'] - temp['first']).dt.seconds / 3600
     temp.drop(['first', 'last'], axis=1, inplace=True)
     data = data.merge(temp, on=['user_id', 'merchant_id'], how='left')  # 统计时间间隔
+
+    if din:
+        lbe_action_type = {0: 1, 1: 2, 2: 3, 3: 4}
+        user_log['action_type'] = user_log['action_type'].map(lbe_action_type)
+        # 用户行为sequence
+        # 把user_log里同user的这些数据合并成一个list
+        temp = pd.DataFrame(user_log.groupby('user_id')['merchant_id', 'action_type'].agg(lambda x: list(x)))
+        # 列名称改成hist_merchant_id 和 hist_action_type
+        temp.columns = ['hist_merchant_id', 'hist_action_type']
+        data = data.merge(temp, on=['user_id'], how='left')  # 统计时间间隔
 
     # 释放内存
     del temp, user_log
