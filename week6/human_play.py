@@ -38,7 +38,7 @@ class Human(object):
 def run():
     n = 5
     # 这里可以修改棋盘的大小，需要和AI Model的棋盘大小相等
-    width, height = 6, 6
+    width, height = 10, 10
     # 调用AI模型
     model_file = 'best_policy.model'
     try:
@@ -48,12 +48,12 @@ def run():
 
         # ############### human VS AI ###################
         # 加载AI Model
-        # best_policy = PolicyValueNet(width, height, model_file = model_file, use_gpu=True)
+        best_policy = PolicyValueNet(width, height, model_file = model_file, use_gpu=False)
         # 设置n_playout越大，效果越好，不需要设置is_selfplay，因为不需要进行AI训练
-        # mcts_player = MCTSPlayer(best_policy.policy_value_fn, c_puct=5, n_playout=400)
+        mcts_player = MCTSPlayer(best_policy.policy_value_fn, c_puct=5, n_playout=400)
 
         # 也可以使用MCTS_Pure进行对弈，但是它太弱了
-        mcts_player = MCTS_Pure(c_puct=5, n_playout=1000)
+        # mcts_player = MCTS_Pure(c_puct=5, n_playout=1000)
 
         # 创建人类player, 输入下棋位置比如 3,3
         human = Human()

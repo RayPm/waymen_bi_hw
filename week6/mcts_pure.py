@@ -88,7 +88,7 @@ class MCTS(object):
         while (1):
             if node.is_leaf():
                 break
-            # 基于贪心算法 选择下一步
+            # 基于UCT贪心算法 选择下一步
             action, node = node.select(self._c_puct)
             state.do_move(action)
         # 对于current player，根据state 得到一组(action, probability)，这里不需要得到得分 _
@@ -100,7 +100,6 @@ class MCTS(object):
         # 采用快速走子策略，评估叶子结点值（是否获胜）
         leaf_value = self._evaluate_rollout(state)
         # 更新本次传播路径（遍历节点）中的（节点值 和 访问次数）
-        print(state.get_current_player(), leaf_value)
         node.update_recursive(-leaf_value)
 
     # 使用rollout策略，一直到游戏结束，如果当前选手获胜返回+1，对手获胜返回-1，平局返回0
